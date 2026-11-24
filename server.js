@@ -1,37 +1,43 @@
-'use strict';
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+require('dotenv').config();
 
-const net = require('net');
-const EventEmitter = require('events').EventEmitter;
+const db = require('./database/connection');
+const initUsersTable = require('./database/init-users');
+const authRoutes = require('./routes/auth');
+const productRoutes = require('./routes/products');
+const categoryRoutes = require('./routes/categories');
+const supplierRoutes = require('./routes/suppliers');
+const dashboardRoutes = require('./routes/dashboard');
+const exchangeRoutes = require('./routes/exchange');
 
-const Connection = require('./connection');
-const ConnectionConfig = require('./connection_config');
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-// TODO: inherit Server from net.Server
-class Server extends EventEmitter {
-  constructor() {
-    super();
-    this.connections = [];
-    this._server = net.createServer(this._handleConnection.bind(this));
-  }
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
 
-  _handleConnection(socket) {
-    const connectionConfig = new ConnectionConfig({
-      stream: socket,
-      isServer: true,
-    });
-    const connection = new Connection({ config: connectionConfig });
-    this.emit('connection', connection);
-  }
+// API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/suppliers', supplierRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/exchange', exchangeRoutes);
 
-  listen(port) {
-    this._port = port;
-    this._server.listen.apply(this._server, arguments);
-    return this;
-  }
+// Serve main page
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
-  close(cb) {
-    this._server.close(cb);
-  }
-}
+// Start server
+app.listen(PORT, async () => {
+  console.log(`\n🚗 Auto Part System is running on http://localhost:${PORT}\n`);
+  await initUsersTable();
+});
 
-module.exports = Server;
+module.exports = app;
