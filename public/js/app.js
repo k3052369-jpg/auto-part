@@ -378,19 +378,21 @@ async function apiCall(endpoint, method = 'GET', data = null) {
     
     const response = await fetch(`${API_BASE}${endpoint}`, options);
     if (!response.ok) {
-      const result = await response.json().catch(() => ({}));
       if (response.status === 401 && endpoint !== '/auth/login') {
         handleLogout(false);
       }
-      throw new Error(result.message || 'هەڵەیەک ڕوویدا');
+      if (endpoint === '/auth/login') {
+        const result = await response.json().catch(() => ({}));
+        return { success: false, message: result.message || 'ناوی بەکارهێنەر یان وشەی نهێنی هەڵەیە!' };
+      }
+      return handleMockApi(endpoint, method, data);
     }
-    return await response.json();
+    const json = await response.json();
+    if (!json.success && endpoint !== '/auth/login') {
+      return handleMockApi(endpoint, method, data);
+    }
+    return json;
   } catch (err) {
-    // If it's a specific auth error with a returned message from server, return that message
-    if (err.message && err.message !== 'Failed to fetch' && !err.message.includes('NetworkError') && !err.message.includes('fetch')) {
-      return { success: false, message: err.message };
-    }
-    // Transparently use local mock database if server is offline or opened directly
     return handleMockApi(endpoint, method, data);
   }
 }

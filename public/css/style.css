@@ -39,6 +39,12 @@
   box-sizing: border-box;
 }
 
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
 body {
   font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Sans Kurdish', Tahoma, Arial, sans-serif;
   background: var(--bg);
@@ -953,29 +959,102 @@ tbody tr:hover {
     flex-direction: row;
     overflow-x: auto;
   }
-  .main-content { margin-right: 0; }
+  .main-content {
+    margin-right: 0 !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+    overflow-x: hidden;
+  }
   .sidebar-nav {
     display: flex;
     padding: 8px;
     gap: 4px;
   }
-  .nav-item { padding: 8px 12px; white-space: nowrap; }
-  .sidebar-header { padding: 12px 16px; }
+  .nav-item { padding: 8px 12px; white-space: nowrap; font-size: 13px; }
+  .sidebar-header { padding: 10px 14px; }
   .sidebar-footer { display: none; }
-  .content { padding: 16px; }
-  .topbar { padding: 12px 16px; }
-  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .content { padding: 12px; max-width: 100vw; box-sizing: border-box; overflow-x: hidden; }
+  
+  .topbar {
+    padding: 10px 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .topbar-right {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .page-title {
+    font-size: 18px;
+  }
+  .topbar-left {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .topbar-date {
+    display: none !important;
+  }
+  .topbar-rate-card {
+    padding: 4px 10px;
+    font-size: 11px;
+    gap: 4px;
+  }
+  .topbar-rate-card input {
+    width: 65px !important;
+    font-size: 12px;
+  }
+  .topbar-calc-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  .topbar-user {
+    gap: 6px;
+  }
+  .topbar-user .user-info {
+    display: none;
+  }
+  .topbar-logout-btn {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+  
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   .filter-bar { flex-direction: column; align-items: stretch; }
-  .search-box { min-width: auto; }
+  .search-box { min-width: auto; width: 100%; }
   .dashboard-welcome {
     align-items: flex-start;
     flex-direction: column;
+    padding: 16px;
   }
   .dashboard-overview-grid {
     grid-template-columns: 1fr;
   }
   .stock-health-layout {
     align-items: center;
+  }
+  
+  .login-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw !important;
+    height: 100vh !important;
+    padding: 14px;
+    box-sizing: border-box;
+  }
+  .login-card {
+    max-width: 100% !important;
+    width: 100% !important;
   }
 }
 
