@@ -73,6 +73,7 @@ function refresh() {
 }
 
 refresh();
-setInterval(refresh, REFRESH_MS);
+const refreshTimer = setInterval(refresh, REFRESH_MS);
+if (typeof refreshTimer.unref === 'function') refreshTimer.unref();
 
 module.exports = { getUsdToIqd, usdToIqd, refresh };

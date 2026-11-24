@@ -3,7 +3,6 @@ const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
-const db = require('./database/connection');
 const initUsersTable = require('./database/init-users');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
@@ -14,15 +13,33 @@ const dashboardRoutes = require('./routes/dashboard');
 const exchangeRoutes = require('./routes/exchange');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+let userTableInitialization;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// API Routes
+async function ensureUsersTable() {
+  if (!userTableInitialization) userTableInitialization = initUsersTable();
+  try {
+    await userTableInitialization;
+  } catch (error) {
+    userTableInitialization = null;
+    throw error;
+  }
+}
+
+app.use('/api', async (req, res, next) => {
+  try {
+    await ensureUsersTable();
+    next();
+  } catch (error) {
+    console.error('User table initialization failed:', error.message);
+    res.status(503).json({ success: false, message: 'The database is not ready.' });
+  }
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
@@ -31,15 +48,20 @@ app.use('/api/sales', salesRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/exchange', exchangeRoutes);
 
-// Serve main page
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Start server
-app.listen(PORT, async () => {
-  console.log(`\n🚗 Auto Part System is running on http://localhost:${PORT}\n`);
-  await initUsersTable();
-});
+if (require.main === module) {
+  const port = process.env.PORT || 3000;
+  app.listen(port, async () => {
+    console.log('Auto Part System is running on http://localhost:' + port);
+    try {
+      await ensureUsersTable();
+    } catch (error) {
+      console.error('User table initialization failed:', error.message);
+    }
+  });
+}
 
 module.exports = app;

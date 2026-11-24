@@ -5,8 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js",
-    "tunnel": "npx localtunnel --port 3000"
+    "dev": "node server.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
